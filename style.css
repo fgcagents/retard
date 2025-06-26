@@ -238,6 +238,24 @@ body {
         color: #2c3e50;
         font-weight: 500;
     }
+
+    /* Estil per a trens amb retard */
+    .tooltip-delayed {
+        background-color: #ff6b6b;
+        border-color: #ff0000;
+        color: white;
+        font-weight: bold;
+    }
+
+    .info-row.delayed {
+        color: #ff0000;
+        font-weight: bold;
+    }
+
+    .delayed-value {
+        color: #ff0000;
+        font-weight: bold;
+    }
   
     .tooltip-verde {
         background-color: rgba(144, 238, 144, 0.85); /* verd clar */
