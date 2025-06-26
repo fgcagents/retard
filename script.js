@@ -118,7 +118,7 @@ function getOrderedItinerary(train) {
   return sortResultsByTime(parades);
 }
 
-function verificarSecuenciaParadas(properes, itinerario, estacioActual) {
+function verificarSecuenciaParades(properes, itinerario, estacioActual) {
   if (properes.length === 0 || itinerario.length === 0) return false;
   
   const indexActual = itinerario.findIndex(p => p.estacio === estacioActual);
