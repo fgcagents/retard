@@ -280,32 +280,12 @@ function getOrderedItinerary(train) {
                 horaPaso = trainInfo[trainData.proximaParada] || '';
             }
 
-            let retardHTML = '';
-            if (horaPaso) {
-              const [h, m] = horaPaso.split(':').map(Number);
-              const horaPrevista = new Date();
-              horaPrevista.setHours(h, m, 0, 0);
-              const ara = new Date();
-
-              const diffMs = ara - horaPrevista;
-              const diffMin = Math.round(diffMs / 60000);
-
-              if (!isNaN(diffMin)) {
-                if (diffMin > 0) {
-                  retardHTML = `<br><span class="label">Retard:</span> <span class="value" style="color:red;">+${diffMin} min</span>`;
-                } else {
-                  retardHTML = `<br><span class="label">A temps</span>`;
-                }
-              }
-            }
-
             const proximaParada = trainData.proximaParada ? 
                 `<div class="info-row">
                     <span class="label">Propera parada:</span> 
                     <span class="value">${trainData.proximaParada}</span>
                     ${horaPaso ? `<br><span class="label">Hora:</span> 
                     <span class="value">${horaPaso}</span>` : ''}
-                    ${retardHTML}
                 </div>` : '';
 
             // Añadir el campo tipus_unitat al popup
@@ -317,10 +297,7 @@ function getOrderedItinerary(train) {
                 permanent: true,
                 direction: 'top',
                 offset: [4, -15],
-                /*className: trainData.en_hora === true ? 'leaflet-tooltip tooltip-verde' : 'leaflet-tooltip tooltip-vermell'*/
-                className: (trainData.en_hora === true || (retardHTML.includes('+') && parseInt(retardHTML.match(/\+(\d+)/)?.[1]) <= 2)) 
-                    ? 'leaflet-tooltip tooltip-verde' 
-                    : 'leaflet-tooltip tooltip-vermell'
+                className: 'leaflet-tooltip tooltip-verde'
               }).bindPopup(`
                 <div class="custom-popup">
                     <h3>🚆 <a href="#" onclick="showItinerary('${trainData.tren}'); return false;">Tren ${trainData.tren}</a></h3>
