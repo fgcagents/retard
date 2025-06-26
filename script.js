@@ -196,7 +196,7 @@ function matchTrains(itineraryList, apiTrains, horaActual) {
         const diffMin = Math.abs((horaEst - horaActual) / 60000);
 
         if (diffMin <= 10 && (estacio === estacioActual || properes.includes(estacio))) {
-          if (estacio === estacioActual || verificarSecuenciaParadas(properes, itinerarioOrdenado, estacio)) {
+          if (estacio === estacioActual || verificarSecuenciaParades(properes, itinerarioOrdenado, estacio)) {
             coincideEnTiempoYSecuencia = true;
             matches.push({
               tren: trenNom,
