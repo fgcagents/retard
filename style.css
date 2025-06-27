@@ -95,6 +95,12 @@ body {
       font-size: 18px;
     }
 
+     #delayedCount {
+      color: #c22626;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
 
     .controls__input-group {
       display: flex;
