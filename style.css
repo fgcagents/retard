@@ -244,12 +244,7 @@ body {
         border: 1px solid #3c763d;
         color: #2e4e2e;
     }
-
-    .tooltip-vermell {
-        background-color: rgba(255, 182, 193, 0.85); /* vermell clar */
-        border: 1px solid #a94442;
-        color: #721c24;
-    }
+    /* Eliminats estils relacionats amb el retard dels trens */
 
       
     #itineraryModal {

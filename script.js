@@ -280,24 +280,6 @@ function getOrderedItinerary(train) {
                 horaPaso = trainInfo[trainData.proximaParada] || '';
             }
 
-            let retardHTML = '';
-            if (horaPaso) {
-              const [h, m] = horaPaso.split(':').map(Number);
-              const horaPrevista = new Date();
-              horaPrevista.setHours(h, m, 0, 0);
-              const ara = new Date();
-
-              const diffMs = ara - horaPrevista;
-              const diffMin = Math.round(diffMs / 60000);
-
-              if (!isNaN(diffMin)) {
-                if (diffMin > 0) {
-                  retardHTML = `<br><span class="label">Retard:</span> <span class="value" style="color:red;">+${diffMin} min</span>`;
-                } else {
-                  retardHTML = `<br><span class="label">A temps</span>`;
-                }
-              }
-            }
 
             const proximaParada = trainData.proximaParada ? 
                 `<div class="info-row">
@@ -305,7 +287,6 @@ function getOrderedItinerary(train) {
                     <span class="value">${trainData.proximaParada}</span>
                     ${horaPaso ? `<br><span class="label">Hora:</span> 
                     <span class="value">${horaPaso}</span>` : ''}
-                    ${retardHTML}
                 </div>` : '';
 
             // Añadir el campo tipus_unitat al popup
