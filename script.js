@@ -165,23 +165,6 @@ function matchTrains(itineraryList, apiTrains, horaActual) {
       trainData.tipus_unitat = api.tipus_unitat || 'Desconegut';
       trainData.en_hora = api.en_hora;
       
-      // Calcular retard
-      if (api.en_hora !== undefined) {
-        trainData.retard = api.en_hora === "N" ? Math.abs(parseInt(api.minuts_retard)) || 0 : 0;
-      } else {
-        const trenNom = trainData.tren;
-        const train = itineraryList.find(t => t.Tren === trenNom);
-        if (train) {
-          const itinerarioOrdenado = getOrderedItinerary(train);
-          const paradaActual = itinerarioOrdenado.find(p => p.estacio === estacioActual);
-          if (paradaActual) {
-            const horaPrevista = parseHora(paradaActual.hora);
-            const diffMin = Math.round((horaActual - horaPrevista) / 60000);
-            trainData.retard = diffMin > 0 ? diffMin : 0;
-          }
-        }
-      }
-      
       const trenNom = trainData.tren;
       const train = itineraryList.find(t => t.Tren === trenNom);
       if (!train || matchedTrains.has(trenNom)) continue;
@@ -204,8 +187,7 @@ function matchTrains(itineraryList, apiTrains, horaActual) {
               direccio,
               estacio: estacioActual,
               hora: hora,
-              matched: true,
-              retard: trainData.retard
+              matched: true
             });
 
             matchedTrains.add(trenNom);
@@ -249,20 +231,13 @@ function matchTrains(itineraryList, apiTrains, horaActual) {
           }
           
           if (puntuacion > mejorPuntuacion) {
-            // Calcular retard per al nou match
-            let retard = 0;
-            const horaPrevista = parseHora(hora);
-            const diffMinRetard = Math.round((horaActual - horaPrevista) / 60000);
-            retard = diffMinRetard > 0 ? diffMinRetard : 0;
-
             mejorMatch = {
               tren: train.Tren,
               linia: liniaItinerary,
               direccio,
               estacio: estacioActual,
               hora: hora,
-              matched: true,
-              retard: retard
+              matched: true
             };
             mejorPuntuacion = puntuacion;
             horaMatch = hora;
@@ -279,7 +254,6 @@ function matchTrains(itineraryList, apiTrains, horaActual) {
         coordinates: api.coordinates,
         proximaParada: properes.length > 0 ? properes[0] : null,
         en_hora: api.en_hora,
-        retard: mejorMatch.retard,
         tipus_unitat: api.tipus_unitat || 'Desconegut'
       });
     }
@@ -291,7 +265,6 @@ function matchTrains(itineraryList, apiTrains, horaActual) {
 function updateMapMarkers() {
   markersLayer.clearLayers();
   let count = 0;
-  let delayedCount = 0;
   
   idToTrainMap.forEach((trainData, id) => {
     const [lng, lat] = trainData.coordinates;
@@ -299,15 +272,8 @@ function updateMapMarkers() {
       const trainInfo = itineraryList.find(t => t.Tren === trainData.tren);
       const flecha = trainInfo && trainInfo['A/D'] === "A" ? "🔼" : "🔽";
       
-      // Determinar si té retard
-      const tieneRetard = trainData.retard >= 2;
-      if (tieneRetard) delayedCount++;
-      
       // Text per al tooltip
       let tooltipText = `${flecha} ${trainData.tren}`;
-      if (tieneRetard) {
-        tooltipText += ` (🚨 +${trainData.retard} min)`;
-      }
       
       // Obtener la hora de paso si existe la próxima parada
       let horaPaso = '';
@@ -324,23 +290,13 @@ function updateMapMarkers() {
         </div>` : '';
 
       // Contingut del popup
-      let retardInfo = '';
-      if (trainData.retard > 0) {
-        retardInfo = `
-          <div class="info-row ${tieneRetard ? 'delayed' : ''}">
-            <span class="label">Retard:</span>
-            <span class="value">+${trainData.retard} min</span>
-          </div>
-        `;
-      }
-
       const marker = L.marker([lat, lng], {
         icon: trainIcon
       }).bindTooltip(tooltipText, {
         permanent: true,
         direction: 'top',
         offset: [4, -15],
-        className: tieneRetard ? 'leaflet-tooltip tooltip-delayed' : 'leaflet-tooltip tooltip-verde'
+        className: 'leaflet-tooltip tooltip-verde'
       }).bindPopup(`
         <div class="custom-popup">
           <h3>🚆 <a href="#" onclick="showItinerary('${trainData.tren}'); return false;">Tren ${trainData.tren}</a></h3>
@@ -348,7 +304,6 @@ function updateMapMarkers() {
             <span class="label">Línia:</span>
             <span class="value">${trainInfo ? trainInfo.Linia : 'N/A'}</span>
           </div>
-          ${retardInfo}
           <div class="info-row">
             <span class="label">Tipus Unitat:</span>
             <span class="value">${trainData.tipus_unitat}</span>
@@ -365,7 +320,6 @@ function updateMapMarkers() {
   });
   
   document.getElementById("matchedCount").textContent = count;
-  document.getElementById("delayedCount").textContent = delayedCount;
 }
 
 function resetData() {
@@ -373,7 +327,6 @@ function resetData() {
   idToTrainMap.clear();
   markersLayer.clearLayers();
   document.getElementById("matchedCount").textContent = "0";
-  document.getElementById("delayedCount").textContent = "0";
 }
 
 async function refresh() {
