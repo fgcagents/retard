@@ -292,16 +292,16 @@ function getOrderedItinerary(train) {
             // Añadir el campo tipus_unitat al popup
             const tipusUnitat = trainData.tipus_unitat || 'Desconegut';
     
+            // Contingut del popup amb retraso acumulado
+            const retrasoAcumulado = trainData.retrasoAcumulado || 0;
+            const retrasoHTML = `<div class="info-row"><span class="label">Retraso acumulado:</span> <span class="value">${retrasoAcumulado} min</span></div>`;
             const marker = L.marker([lat, lng], {
                 icon: trainIcon
             }).bindTooltip(`${flecha} ${trainData.tren}`, {
                 permanent: true,
                 direction: 'top',
                 offset: [4, -15],
-                /*className: trainData.en_hora === true ? 'leaflet-tooltip tooltip-verde' : 'leaflet-tooltip tooltip-vermell'*/
-                className: (trainData.en_hora === true || (retardHTML.includes('+') && parseInt(retardHTML.match(/\+(\d+)/)?.[1]) <= 2)) 
-                    ? 'leaflet-tooltip tooltip-verde' 
-                    : 'leaflet-tooltip tooltip-vermell'
+                className: 'leaflet-tooltip tooltip-verde'
               }).bindPopup(`
                 <div class="custom-popup">
                     <h3>🚆 <a href="#" onclick="showItinerary('${trainData.tren}'); return false;">Tren ${trainData.tren}</a></h3>
@@ -309,6 +309,7 @@ function getOrderedItinerary(train) {
                         <span class="label">Línea:</span>
                         <span class="value">${trainInfo ? trainInfo.Linia : 'N/A'}</span>
                     </div>
+                    ${retrasoHTML}
                     ${proximaParada}
                     <div class="info-row">
                         <span class="label">Tipus Unitat:</span>
@@ -316,9 +317,8 @@ function getOrderedItinerary(train) {
                     </div>
                 </div>
             `, {
-                offset: L.point(4, 0)  // Desplaza el popup 20 píxeles hacia arriba
+                offset: L.point(4, 0)
             });
-            
             markersLayer.addLayer(marker);
             count++;
         }
